@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy as sa
 from flask_cors import CORS
@@ -35,6 +35,24 @@ def get_todos():
         }
     }
 
+
+@app.post('/add_todos')
+def add_todos():
+    action = request.form.get("action")
+    item = Todos(action=action)
+    db.session.add(item)
+    db.session.commit()
+    return {
+        "status": 0,
+        "description": "OK",
+        "data": {
+            "todos": {
+                "id": item.id,
+                "action": item.action,
+                "done": item.done
+            }
+        }
+    }
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
