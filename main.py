@@ -1,13 +1,18 @@
 import sqlalchemy as sa
 from flask import Flask, request
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
+app.config["SECRET_KEY"] = "secret key"
 
 db = SQLAlchemy(app)
 CORS(app)
+
+admin = Admin(app)
 
 
 class Todos(db.Model):
@@ -18,6 +23,13 @@ class Todos(db.Model):
 
 with app.app_context():
     db.create_all()
+
+
+class TodosIndexView(ModelView):
+    pass
+
+
+admin.add_view(TodosIndexView(Todos, db.session, name='Todos'))
 
 
 @app.get('/todos')
