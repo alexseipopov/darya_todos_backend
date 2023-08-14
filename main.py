@@ -1,7 +1,7 @@
-from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy as sa
+from flask import Flask, request
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
@@ -56,27 +56,12 @@ def add_todos():
 
 
 @app.put('/todos/<int:id>')
-def update_todos(id):
-    item = Todos.query.get(id)
-    item.done = not item.done
-    db.session.commit()
-    return {
-        "status": 0,
-        "description": "OK",
-        "data": {
-            "todos": {
-                "id": item.id,
-                "action": item.action,
-                "done": item.done
-            }
-        }
-    }
-
-
-@app.put('/todos/<int:id>')
 def change_todos(id):
     item = Todos.query.get(id)
-    item.action = request.json.get("action")
+    action = request.json.get("action")
+    done = request.json.get("done")
+    item.action = action if action else item.action
+    item.done = not done if done else item.done
     db.session.commit()
     return {
         "status": 0,
